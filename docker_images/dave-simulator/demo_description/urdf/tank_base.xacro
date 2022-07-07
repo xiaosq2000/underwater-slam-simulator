@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="tank" params="tank_length tank_width tank_height wall_thickness">
+    <xacro:property name="namespace" value="tank"/>
+
+    <gazebo>
+      <static>true</static>
+    </gazebo>
+    <origin xyz="0 0 -${tank_height}"/>
+
+    <link name="${namespace}/bottom">
+      <inertial> 
+        <mass value="1"/>
+        <inertia ixx="1" ixy="1" ixz="1" iyy="1" iyz="1" izz="1"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <box size="${tank_length} ${tank_width} ${wall_thickness}"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${tank_length} ${tank_width} ${wall_thickness}"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${namespace}/surface">
+      <inertial>
+        <mass value="1"/>
+        <inertia ixx="1" ixy="1" ixz="1" iyy="1" iyz="1" izz="1"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <box size="${tank_length} ${tank_width} .01"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${tank_length} ${tank_width} .01"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${namespace}/north_wall">
+      <inertial>
+        <mass value="1"/>
+        <inertia ixx="1" ixy="1" ixz="1" iyy="1" iyz="1" izz="1"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <box size="${tank_length} ${wall_thickness} ${tank_height+wall_thickness}"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${tank_length} ${wall_thickness} ${tank_height+wall_thickness}"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${namespace}/south_wall">
+      <inertial>
+        <mass value="1"/>
+        <inertia ixx="1" ixy="1" ixz="1" iyy="1" iyz="1" izz="1"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <box size="${tank_length} ${wall_thickness} ${tank_height+wall_thickness}"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${tank_length} ${wall_thickness} ${tank_height+wall_thickness}"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${namespace}/west_wall">
+      <inertial>
+        <mass value="1"/>
+        <inertia ixx="1" ixy="1" ixz="1" iyy="1" iyz="1" izz="1"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <box size="${wall_thickness} ${tank_width+(2*wall_thickness)}  ${tank_height+wall_thickness}"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${wall_thickness} ${tank_width+(2*wall_thickness)}  ${tank_height+wall_thickness}"/>
+        </geometry>
+      </collision>
+    </link>
+    <link name="${namespace}/east_wall">
+      <inertial>
+        <mass value="1"/>
+        <inertia ixx="1" ixy="1" ixz="1" iyy="1" iyz="1" izz="1"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <box size="${wall_thickness} ${tank_width+(2*wall_thickness)}  ${tank_height+wall_thickness}"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${wall_thickness} ${tank_width+(2*wall_thickness)}  ${tank_height+wall_thickness}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="${namespace}/bottom_to_surface" type="fixed">
+      <parent link="${namespace}/bottom"/>
+      <child link="${namespace}/surface"/>
+      <origin xyz="0 0 ${tank_height}"/>
+    </joint>
+    <joint name="${namespace}/bottom_to_north" type="fixed">
+      <parent link="${namespace}/bottom"/>
+      <child link="${namespace}/north_wall"/>
+      <origin xyz="0 ${(wall_thickness+tank_width)/2} ${tank_height/2}"/>
+    </joint>
+    <joint name="${namespace}/bottom_to_south" type="fixed">
+      <parent link="${namespace}/bottom"/>
+      <child link="${namespace}/south_wall"/>
+      <origin xyz="0 -${(wall_thickness+tank_width)/2} ${tank_height/2}"/>
+    </joint>
+    <joint name="${namespace}/bottom_to_west" type="fixed">
+      <parent link="${namespace}/bottom"/>
+      <child link="${namespace}/west_wall"/>
+      <origin xyz="-${(wall_thickness+tank_length)/2} 0 ${tank_height/2}"/>
+    </joint>
+    <joint name="${namespace}/bottom_to_east" type="fixed">
+      <parent link="${namespace}/bottom"/>
+      <child link="${namespace}/east_wall"/>
+      <origin xyz="${(wall_thickness+tank_length)/2} 0 ${tank_height/2}"/>
+    </joint>
+
+    <gazebo reference="${namespace}/bottom">
+      <material>Gazebo/CeilingTiled</material>
+    </gazebo>
+    <gazebo reference="${namespace}/north_wall">
+      <material>Gazebo/CeilingTiled</material>
+    </gazebo>
+    <gazebo reference="${namespace}/south_wall">
+      <material>Gazebo/CeilingTiled</material>
+    </gazebo>
+    <gazebo reference="${namespace}/west_wall">
+      <material>Gazebo/CeilingTiled</material>
+    </gazebo>
+    <gazebo reference="${namespace}/east_wall">
+      <material>Gazebo/CeilingTiled</material>
+    </gazebo>
+    <gazebo reference="${namespace}/surface">
+      <material>UUVSimulator/StaticWater</material>
+      <visual>
+        <cast_shadows>0</cast_shadows>
+      </visual>
+    </gazebo>
+
+  </xacro:macro>
+</robot>

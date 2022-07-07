@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- world -->
+    <arg name="world_name" default="$(find demo_description)/worlds/demo.world"/>
+    <arg name="paused" default="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="debug" default="false"/>
+    <arg name="verbose" default="false"/>
+
+    <!-- tank and obstacles -->
+    <arg name="tank_name"       default="$(find demo_description)/urdf/tank.xacro"/>
+    <arg name="tank_length"     default="18"/>
+    <arg name="tank_width"      default="12"/>
+    <arg name="tank_height"     default="6"/>
+    <arg name="wall_thickness"  default="1"/>
+    <arg name="cylinder_name"   default="$(find demo_description)/urdf/cylinder.xacro"/>
+    <arg name="cylinder_length" default="4"/>
+    <arg name="cylinder_radius" default="2"/>
+
+    <!-- robot -->
+    <arg name="namespace" default="rexrov"/>
+    <arg name="mode" default="sonar"/>
+    <arg name="velocity_control" default="true"/>
+    <arg name="set_timeout" default="false"/>
+    <arg name="timeout" default="0.0"/>
+
+    <!-- use Gazebo's empty_world.launch with dave_ocean_waves.world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world_name)"/>
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="headless" value="$(arg headless)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="verbose" value="$(arg verbose)"/>
+    </include>
+
+    <!-- push robot_description to factory and spawn robot in gazebo -->
+    <group ns="tank">
+        <param name="robot_description" command="$(find xacro)/xacro $(arg tank_name) tank_length:=$(arg tank_length) tank_width:=$(arg tank_width) tank_height:=$(arg tank_height) wall_thickness:=$(arg wall_thickness)"/>
+        <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" args="-unpause -urdf -model tank -param robot_description" respawn="false" output="screen"/>
+    </group>
+
+    <group ns="cylinder">
+        <param name="robot_description" command="$(find xacro)/xacro $(arg cylinder_name) cylinder_length:=$(arg cylinder_length) cylinder_radius:=$(arg cylinder_radius)"/>
+        <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" args="-unpause -urdf -model cylinder -param robot_description" respawn="false" output="screen"/>
+    </group>
+
+
+    <!-- rexrov robot -->
+    <include file="$(find uuv_descriptions)/launch/upload_rexrov_default.launch">
+        <arg name="namespace" value="$(arg namespace)"/>
+        <arg name="mode" value="$(arg mode)"/>
+        <arg name="x" value="0"/>
+        <arg name="y" value="0"/>
+        <arg name="z" value="$(eval -2/3 * arg('tank_height'))"/>
+        <arg name="debug" value="$(arg debug)"/>
+    </include>
+
+    <!-- sonar -->
+    <node name="image_view_sonar" pkg="image_view" type="image_view" args="image:=/$(arg namespace)/oculus_m1200d/sonar_image" if="$(eval arg('mode') == 'sonar')">
+        <param name="window_name" value="oculus_m1200d" />
+        <param name="autosize" value="true" />
+        <param name="filename_format" value="/tmp/SonarImage_capture_%04i.jpg" />
+    </node>
+
+    <!-- <node pkg="tf" type="static_transform_publisher" name="multibeam_sonar_base_link"
+            args="0 0 0 0 0 0 map forward_sonar_optical_link 50" if="$(eval arg('mode') == 'sonar')"/> -->
+
+    <!-- keyboard control -->
+    <include if="$(arg velocity_control)" file="$(find uuv_control_cascaded_pid)/launch/key_board_velocity.launch">
+        <arg name="model_name" value="$(arg namespace)"/>
+    </include>
+</launch>

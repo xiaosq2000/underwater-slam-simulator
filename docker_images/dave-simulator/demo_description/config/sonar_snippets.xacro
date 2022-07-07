@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!-- Copyright (c) 2016 The UUV Simulator Authors.
+     All rights reserved.
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- oculus-m1200d -->
+  <xacro:macro name="forward_multibeam_sonar_oculus_m1200d" params="namespace parent_link">
+    <link name="${namespace}/forward_sonar_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.0360"  ixy="0"  ixz="0" iyy="0" iyz="0" izz="0.0360"/>
+        <mass value="4.35"/>
+      </inertial>
+      <collision name="collision">
+        <origin xyz="0 0 0" rpy="0 0 ${pi/2}"/>
+        <geometry>
+            <mesh filename="file://$(find nps_uw_multibeam_sonar)/models/oculus_m1200d_nps_multibeam/meshes/COLLISION-Oculus-M-series.dae" scale="4 4 4"/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 ${pi/2}"/>
+        <geometry>
+            <mesh filename="file://$(find nps_uw_multibeam_sonar)/models/oculus_m1200d_nps_multibeam/meshes/Oculus-M-series.dae" scale="4 4 4"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="${namespace}_forward_sonar_joint" type="fixed">
+      <origin xyz="1.2 0 -0.55" rpy="0 0 0"/>
+      <parent link="${parent_link}" />
+      <child link="${namespace}/forward_sonar_link" />
+    </joint>
+
+    <gazebo reference="${namespace}/forward_sonar_link">
+      <sensor name="image_sonar" type="depth">
+        <visualize>true</visualize>
+        <always_on>true</always_on>
+        <update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.0471975512</horizontal_fov>
+          <image>
+            <width>512</width>
+            <height>256</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>02</near>            
+            <far>60</far>
+          </clip>
+          <depth_camera>
+            <output>depths</output>
+          </depth_camera>
+          <save enabled="false">
+            <path>/tmp/camera</path>
+          </save>
+        </camera>
+        <plugin filename="libnps_multibeam_sonar_ros_plugin.so" name="forward_sonar">
+          <verticalFOV>12</verticalFOV>
+          <sonarFreq>21e3</sonarFreq>
+          <bandwidth>30e3</bandwidth>
+          <soundSpeed>1500</soundSpeed>
+          <sourceLevel>220</sourceLevel>
+          <maxDistance>20</maxDistance>
+          <constantReflectivity>false</constantReflectivity>
+          <customSDFTagReflectivity>true</customSDFTagReflectivity>
+          <customSDFTagDatabaseFile>customSDFTagDatabase.csv</customSDFTagDatabaseFile>
+          <reflectivityDatabaseFile>variationalReflectivityDatabase.csv</reflectivityDatabaseFile>
+          <raySkips>10</raySkips>
+          <sensorGain>1</sensorGain>
+          <plotScaler>0</plotScaler>
+          <writeLog>false</writeLog>
+          <debugFlag>false</debugFlag>
+          <writeFrameInterval>5</writeFrameInterval>
+          <cameraName>oculus_m1200d</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>image_raw/camera_info</cameraInfoTopicName>
+          <pointCloudTopicName>point_cloud</pointCloudTopicName>
+          <depthImageTopicName>image_depth</depthImageTopicName>
+          <depthImageCameraInfoTopicName>image_depth/camera_info</depthImageCameraInfoTopicName>
+          <sonarImageRawTopicName>sonar_image_raw</sonarImageRawTopicName>
+          <sonarImageTopicName>sonar_image</sonarImageTopicName>
+          <frameName>forward_sonar_optical_link</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+</robot>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot name="tank" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="tank_length"    default="40"/>
+  <xacro:arg name="tank_width"     default="20"/>
+  <xacro:arg name="tank_height"    default="10"/>
+  <xacro:arg name="wall_thickness" default="1"/>
+
+  <xacro:include filename="$(find demo_description)/urdf/tank_base.xacro"/>
+
+  <xacro:tank tank_length="$(arg tank_length)" tank_width="$(arg tank_width)" tank_height="$(arg tank_height)" wall_thickness="$(arg wall_thickness)">
+  </xacro:tank>
+
+</robot>

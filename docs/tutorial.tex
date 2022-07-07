@@ -1,0 +1,31 @@
+\documentclass[fontset=windows]{ctexart}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+}
+\title{水下SLAM仿真系统文档}
+\author{肖书奇\footnote{邮箱xiaosq2000@gmail.com；微信号xiaosq2000}}
+\date{}
+\begin{document}
+\maketitle
+\begin{enumerate}
+    \item 操作系统及中间件：Ubuntu 20.04 LTS, ROS Noetic
+    \item 水下机器人仿真器：UUV Simulator
+    \item 多波束声呐仿真器：NPS Multibeam Simulator (需要NVIDIA CUDA)
+    \item 测试用例包：demo description
+\end{enumerate}
+\section{水下机器人仿真器}
+仔细阅读\href{https://uuvsimulator.github.io/packages/uuv_simulator/intro/}{ UUV Simulator 项目主页}，内有项目简介，功能介绍，开源代码仓库链接，使用教程等。
+\par 尽管该项目未有 ROS Noetic 的官方发布，但经过本人测试，自行编译源代码可在Noetic环境下正常工作，其 \href{https://github.com/uuvsimulator/uuv_simulator/wiki}{Github Wiki} 介绍了 kinetic 版本的手动编译方法，注意不要机械地复制指令并执行，请将 kinetic 替换为 noetic，替换Gazebo版本号，替换你的catkin工作空间的路径等。另外，该Wiki中含有基本示例，建议实操体验。
+\section{多波束声呐仿真器}
+仔细阅读\href{https://field-robotics-lab.github.io/dave.doc/contents/dave_sensors/Multibeam-Forward-Looking-Sonar/}{ NPS Multibeam Sonar 项目主页}，该项目的文档非常丰富（本系统不需要DAVE Project的其他组件，但建议充分学习）。
+\par 需要注意的是，在安装 CUDA 之前，请确保你的 NVIDIA 显卡驱动正常安装，如何在Ubuntu系统安装NVIDIA驱动，以及如何检测，请参阅其他网上资源。
+\par 另外，其依赖 \href{https://github.com/apl-ocean-engineering/hydrographic_msgs}{hydrographic\_msgs} 仍在不断更新，截至今日其main分支已经与nps\_multibeam\_simulator不兼容，故请git checkout到合适的历史节点，比如9fcdbe61bc781368b08e43a3d1af632b0ce08bc1。
+\section{测试用例包}
+针对实验室环境的测试用例包主要包含仿真声呐与Rexrov2的集成，基于xarco的水池场景模型（比起SDF文件更简洁，更方便调整尺寸），UUV\_Simulator 水下仿真环境中Oculus M1200D仿真的参数调整三项工作，该ROS软件包的结构并不复杂，主要涉及xarco格式的模型参数文件以及roslaunch文件，可在ROS与Gazebo中的官方文档中学习。将该软件包其置于你的工作空间，正确配置路径即可使用。
+\end{document}
